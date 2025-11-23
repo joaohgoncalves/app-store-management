@@ -39,6 +39,7 @@ Ideal for:
 
 ## 🏗️ **Current Architecture**
 
+```md
 sistemalojinha.py
 │
 ├── UI Components
@@ -47,6 +48,8 @@ sistemalojinha.py
 ├── SQLite Database Functions
 ├── Business Logic
 └── Utilities & Helpers
+```
+
 
 
 > A complete modular refactor is planned for future releases.
