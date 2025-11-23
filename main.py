@@ -742,39 +742,119 @@ def get_payment_methods_report():
     with db_lock:
         conn = get_db_conn()
         cur = conn.cursor()
-        cur.execute("""
-            SELECT payment_method,
-                   COUNT(*) as total_sales,
-                   SUM(total_value) as total_value
-            FROM sales
-            WHERE payment_method IS NOT NULL
-            GROUP BY payment_method
-            ORDER BY total_value DESC
-        """)
-        rows = cur.fetchall()
-        columns = [desc[0] for desc in cur.description]
+        # Check whether `payment_method` column exists in `sales` table
+        try:
+            cur.execute("PRAGMA table_info(sales)")
+            sales_cols = [r[1] for r in cur.fetchall()]
+        except Exception:
+            sales_cols = []
+
+        if 'payment_method' in sales_cols:
+            cur.execute("""
+                SELECT payment_method,
+                       COUNT(*) as total_sales,
+                       SUM(total_value) as total_value
+                FROM sales
+                WHERE payment_method IS NOT NULL AND payment_method != ''
+                GROUP BY payment_method
+                ORDER BY total_value DESC
+            """)
+            rows = cur.fetchall()
+            columns = [desc[0] for desc in cur.description]
+            conn.close()
+            return [dict(zip(columns, r)) for r in rows]
+
+        # Fallback: if sales.payment_method missing, try aggregating from sale_payments
+        try:
+            cur.execute("PRAGMA table_info(sale_payments)")
+            sp_cols = [r[1] for r in cur.fetchall()]
+        except Exception:
+            sp_cols = []
+
+        if 'payment_method' in sp_cols:
+            # Aggregate one payment_method per sale (take max non-empty value) and sum the sale total_value
+            cur.execute("""
+                SELECT spm.payment_method as payment_method,
+                       COUNT(*) as total_sales,
+                       SUM(s.total_value) as total_value
+                FROM (
+                    SELECT sale_id, MAX(payment_method) AS payment_method
+                    FROM sale_payments
+                    WHERE payment_method IS NOT NULL AND payment_method != ''
+                    GROUP BY sale_id
+                ) spm
+                JOIN sales s ON s.id = spm.sale_id
+                GROUP BY spm.payment_method
+                ORDER BY total_value DESC
+            """)
+            rows = cur.fetchall()
+            columns = [desc[0] for desc in cur.description]
+            conn.close()
+            return [dict(zip(columns, r)) for r in rows]
+
+        # If neither column exists, return empty report
         conn.close()
-        return [dict(zip(columns, r)) for r in rows]
+        return []
 
 def get_installments_report():
     """Gera relatório de vendas parceladas"""
     with db_lock:
         conn = get_db_conn()
         cur = conn.cursor()
-        cur.execute("""
-            SELECT num_installments,
-                   COUNT(*) as total_sales,
-                   SUM(total_value) as total_value,
-                   AVG(total_value) as avg_value
-            FROM sales
-            WHERE num_installments > 1
-            GROUP BY num_installments
-            ORDER BY num_installments
-        """)
-        rows = cur.fetchall()
-        columns = [desc[0] for desc in cur.description]
+        # Check whether `num_installments` exists in `sales` table
+        try:
+            cur.execute("PRAGMA table_info(sales)")
+            sales_cols = [r[1] for r in cur.fetchall()]
+        except Exception:
+            sales_cols = []
+
+        if 'num_installments' in sales_cols:
+            cur.execute("""
+                SELECT num_installments,
+                       COUNT(*) as total_sales,
+                       SUM(total_value) as total_value,
+                       AVG(total_value) as avg_value
+                FROM sales
+                WHERE num_installments > 1
+                GROUP BY num_installments
+                ORDER BY num_installments
+            """)
+            rows = cur.fetchall()
+            columns = [desc[0] for desc in cur.description]
+            conn.close()
+            return [dict(zip(columns, r)) for r in rows]
+
+        # Fallback: infer number of installments from sale_payments if available
+        try:
+            cur.execute("PRAGMA table_info(sale_payments)")
+            sp_cols = [r[1] for r in cur.fetchall()]
+        except Exception:
+            sp_cols = []
+
+        if 'id' in sp_cols:
+            cur.execute("""
+                SELECT sp.cnt AS num_installments,
+                       COUNT(*) AS total_sales,
+                       SUM(s.total_value) AS total_value,
+                       AVG(s.total_value) AS avg_value
+                FROM (
+                    SELECT sale_id, COUNT(*) AS cnt
+                    FROM sale_payments
+                    GROUP BY sale_id
+                    HAVING cnt > 1
+                ) sp
+                JOIN sales s ON s.id = sp.sale_id
+                GROUP BY sp.cnt
+                ORDER BY sp.cnt
+            """)
+            rows = cur.fetchall()
+            columns = [desc[0] for desc in cur.description]
+            conn.close()
+            return [dict(zip(columns, r)) for r in rows]
+
+        # If we can't determine installments, return empty list
         conn.close()
-        return [dict(zip(columns, r)) for r in rows]
+        return []
 
 
 # Employee-sales features and helpers removed (employee tab and related DB tables). UI and DB helpers were deleted.
