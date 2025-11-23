@@ -106,25 +106,7 @@ python sistemalojinha.py
 
 ---
 
-## 🧱 Planned Refactor Structure
 
-/app
-/views
-/components
-/services
-/models
-/db
-/utils
-main.py
-
-
-**This will bring:**
-- Scalability  
-- Better separation of concerns  
-- Cleaner testing  
-- More maintainable architecture  
-
----
 
 ## 📷 Screenshots
 
