@@ -110,9 +110,14 @@ python sistemalojinha.py
 
 ## 📷 Screenshots
 
-<img src="screenshots/login.png" alt="Login Screen" width="300" />  
-<img src="screenshots/home.png" alt="Home Screen" width="300" />  
-<img src="screenshots/reports.png" alt="Reports Screen" width="300" />
+- **Login:**  
+  <img src="screenshots/login.png" alt="Login Screen" width="300" />
+
+- **Home / Dashboard:**  
+  ![Home Screen](screenshots/Home.png)
+
+- **Relatórios:**  
+  ![Reports Screen](screenshots/reports.png)
 
 ## 📄 License
 
