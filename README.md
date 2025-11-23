@@ -106,18 +106,23 @@ python sistemalojinha.py
 
 ---
 
-
-
 ## 📷 Screenshots
 
-- **Login:**  
-  <img src="screenshots/login.png" alt="Login Screen" width="300" />
+Aqui estão algumas telas principais do sistema:
 
-- **Home / Dashboard:**  
-  ![Home Screen](screenshots/Home.png)
+<img src="https://github.com/user-attachments/assets/299cc0ac-9930-425c-87a5-d9ab7a2dd03d" alt="Login" width="400" />&nbsp;&nbsp;
+<img src="https://github.com/user-attachments/assets/feb45f9d-1398-4255-8938-75a943d2a1dc" alt="Home" width="400" />
 
-- **Relatórios:**  
-  ![Reports Screen](screenshots/reports.png)
+<br><br>
+
+<img src="https://github.com/user-attachments/assets/8e543619-4781-4e2a-80c7-5aec53d80b8f" alt="User Management" width="400" />&nbsp;&nbsp;
+<img src="https://github.com/user-attachments/assets/4f674bbc-03d5-4d14-8154-42b8e43dcd1b" alt="Product Management" width="400" />
+
+<br><br>
+
+<img src="https://github.com/user-attachments/assets/d553090f-5055-4d8d-81e2-55ca6d3de7e9" alt="Sales" width="400" />&nbsp;&nbsp;
+<img src="https://github.com/user-attachments/assets/f7b069e5-6fb9-436a-b1ab-d9a1600d1907" alt="Reports" width="400" />
+
 
 ## 📄 License
 
